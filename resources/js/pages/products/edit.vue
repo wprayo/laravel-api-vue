@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { reactive, ref, onMounted } from 'vue';
-import axios from 'axios';
 import { router } from '@inertiajs/vue3';
+import axios from 'axios';
+import { reactive, ref, } from 'vue';
+
 
 // Menerima data produk dari Laravel sebagai props
 const props = defineProps<{

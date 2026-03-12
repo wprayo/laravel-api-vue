@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'; // Tambahkan computed
-import axios from 'axios';
-import { Product } from '@/types/product';
 import { router } from '@inertiajs/vue3';
+import axios from 'axios';
+import { ref, onMounted, computed } from 'vue'; // Tambahkan computed
+
+import type { Product } from '@/types/product';
+
 
 const products = ref<Product[]>([]);
 const loading = ref(true);
@@ -31,12 +33,12 @@ const formatCurrency = (value: string | number) => {
 
 // 3. Logika Pencarian (Computed)
 // Ini akan memfilter produk secara otomatis saat searchQuery berubah
-const filteredProducts = computed(() => {
-    return products.value.filter(product => {
-        return product.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-               product.description?.toLowerCase().includes(searchQuery.value.toLowerCase());
-    });
-});
+ const filteredProducts = computed(() => {
+     return products.value.filter(product => {
+         return product.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+                product.description?.toLowerCase().includes(searchQuery.value.toLowerCase());
+     });
+ });
 
 // 4. Fungsi Hapus
 const deleteProduct = async (id: number) => {
@@ -46,6 +48,7 @@ const deleteProduct = async (id: number) => {
             products.value = products.value.filter(p => p.id !== id);
             alert('Produk berhasil dihapus');
         } catch (error) {
+            console.error(error);
             alert('Gagal menghapus produk');
         }
     }
@@ -59,6 +62,15 @@ onMounted(() => {
 <template>
     <div class="p-8 bg-gray-50 min-h-screen">
         <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow">
+            <div class="mb-4">
+                <input 
+                v-model="searchQuery" 
+                type="text" 
+                placeholder="Cari nama atau deskripsi..." 
+                class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                />
+            </div>
+
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-2xl font-bold text-gray-800">Inventory Produk</h1>
                 <button @click="router.visit('/products/create')" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
@@ -83,7 +95,7 @@ onMounted(() => {
                 <tbody>
                     <tr v-for="product in products" :key="product.id" class="border-b hover:bg-gray-50">
                         <td class="p-3 font-medium">{{ product.name }}</td>
-                        <td class="p-3 text-green-600 font-semibold">Rp{{ product.price.toLocaleString() }}</td>
+                        <td class="p-3 text-green-600 font-semibold">{{ formatCurrency(product.price) }}</td>
                         <td class="p-3 text-center">{{ product.stock }}</td>
                         <td class="p-3">
                             <img 
@@ -100,6 +112,9 @@ onMounted(() => {
                             <button @click="router.visit(`/products/${product.id}/edit`)" class="text-blue-500 hover:underline mr-2">Edit</button>
                             <button @click="deleteProduct(product.id)" class="text-red-500 hover:underline">Hapus</button>
                         </td>
+                    </tr>
+                    <tr v-if="filteredProducts.length === 0">
+                        <td colspan="4" class="p-6 text-center text-gray-400">Produk tidak ditemukan.</td>
                     </tr>
                 </tbody>
             </table>

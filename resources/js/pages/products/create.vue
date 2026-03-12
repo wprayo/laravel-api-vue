@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
-import axios from 'axios';
 import { router } from '@inertiajs/vue3';
+import axios from 'axios';
+import { reactive, ref } from 'vue';
+
+
 
 const form = reactive({
     name: '',
